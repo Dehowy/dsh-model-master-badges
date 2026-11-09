@@ -20,11 +20,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/NEETnina/dsh-model-master.git"
+    "url": "git+https://github.com/Dehowy/dsh-model-master-badges.git"
   },
-  "homepage": "https://github.com/NEETnina/dsh-model-master#readme",
+  "homepage": "https://github.com/Dehowy/dsh-model-master-badges#readme",
   "bugs": {
-    "url": "https://github.com/NEETnina/dsh-model-master/issues"
+    "url": "https://github.com/Dehowy/dsh-model-master-badges/issues"
   },
   "author": "NEETnina",
   "devDependencies": {

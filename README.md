@@ -125,30 +125,80 @@ English / 中文 / हिन्दी / Español / Français / العربية / 
 
 需要 **DSH 与 Node.js ≥ 20**。
 
-```bash
-# 装进 web profile（最常用）
-dsh plugin --profile web add dsh-model-master
+> ⚠️ **这个 fork 没有发布到 npm，而且包名和版本号与上游完全相同（`dsh-model-master@1.1.2`）。**
+> 所以下面这条**装的是上游原版**，不是本 fork —— 你会得到 TOP100 按钮、作者头像，也看不到促销标签：
+>
+> ```bash
+> dsh plugin --profile web add dsh-model-master   # ← 上游原版，不是这个 fork
+> ```
+>
+> 想装本 fork，用下面三种方式之一。
 
-# 或装进你自己创建的 profile
-dsh plugin --profile <your-profile> add dsh-model-master
+### 方式一：直接从 GitHub 装（推荐）
+
+```bash
+dsh plugin --profile web add github:Dehowy/dsh-model-master-badges#fork/model-badges
 ```
 
-`dsh plugin` 会把 pnpm 转发到 profile 目录里执行，然后把本包声明的 bundle patch（`cordis.patch.yml`）应用上去。装完**重启 DSH**（或让 HMR 自行重载）。
-
-### 从源码安装
+`#` 后面是分支名。不写分支会落到仓库默认分支，而默认分支就是 `fork/model-badges`，所以简写成下面这样也可以：
 
 ```bash
-git clone https://github.com/NEETnina/dsh-model-master.git
-cd dsh-model-master
-npm install
-dsh plugin --profile web add .
+dsh plugin --profile web add github:Dehowy/dsh-model-master-badges
 ```
+
+这条路拉的是源码。本仓库纯 JS、无构建步骤，`tools/` 与 `tests/` 不参与运行时，pnpm 不需要你授权任何 build 脚本。
+
+### 方式二：tarball
+
+从 [Releases](https://github.com/Dehowy/dsh-model-master-badges/releases) 下载 `dsh-model-master-1.1.2.tgz`，然后：
+
+```bash
+dsh plugin --profile web add ./dsh-model-master-1.1.2.tgz
+```
+
+也可以自己打一个：
+
+```bash
+npm run pack     # → dist/dsh-model-master-1.1.2.tgz（会先校验 manifest，再逐字节回读校验）
+```
+
+### 方式三：本地 clone 后装目录
+
+```bash
+git clone -b fork/model-badges https://github.com/Dehowy/dsh-model-master-badges.git
+dsh plugin --profile web add ./dsh-model-master-badges
+```
+
+改动源码后重跑一次 `add` 即可，不需要 install 任何依赖。
+
+### 装完
+
+**重启 DSH**，模型面板里才会出现促销标签、TOP100 按钮才会消失（HMR 有时能自行重载，但不保证）。
+
+### 怎么确认装的是 fork 而不是上游
+
+```bash
+# 1. 包里应该有 FORK.md —— 上游没有这个文件
+ls ~/.dsh-beta/profiles/desktop/node_modules/dsh-model-master/FORK.md
+
+# 2. 或者直接看两个指纹
+grep -c "function renderModelBadge" ~/.dsh-beta/profiles/desktop/node_modules/dsh-model-master/client.js   # 1 = 是 fork
+grep -c "AUTHOR_AVATAR"            ~/.dsh-beta/profiles/desktop/node_modules/dsh-model-master/client.js   # 0 = 是 fork
+```
+
+（Windows 下把 `~/.dsh-beta` 换成 `C:\Users\<你>\.dsh-beta`，`ls`/`grep` 换成对应命令。）
 
 ### 卸载
 
 ```bash
 dsh plugin --profile web remove dsh-model-master
 ```
+
+卸载后再装回上游原版，直接 `dsh plugin --profile web add dsh-model-master` 就行。
+
+### 关于「检查更新」
+
+本 fork 的版本号**故意保持 1.1.2**。更新检查是对着上游仓库（`NEETnina/dsh-model-master`）的 release 比较的，上游最新就是 `v1.1.2`，所以不会误报有更新。代价是它也不会告诉你本 fork 自己有没有新提交 —— 想拿最新就直接重装上面的 git spec。
 
 ---
 
@@ -298,15 +348,17 @@ npm run format:check
 
 ### 分发方式
 
-三种，按推荐顺序：
+本 fork 只在 GitHub 上分发，不发布到 npm。三种装法，按推荐顺序：
 
-| 方式        | 用户侧命令                                                      | 需要构建授权                                 |
-| ----------- | --------------------------------------------------------------- | -------------------------------------------- |
-| **npm**     | `dsh plugin --profile web add dsh-model-master`                 | 否（预构建产物）                             |
-| **tarball** | `dsh plugin --profile web add ./dsh-model-master-1.1.2.tgz`     | 否（预构建产物）                             |
-| **git**     | `dsh plugin --profile web add github:NEETnina/dsh-model-master` | **是**（拉的是源码，pnpm 需授权 build 脚本） |
+| 方式        | 用户侧命令                                                                     | 需要构建授权          |
+| ----------- | ------------------------------------------------------------------------------ | --------------------- |
+| **git**     | `dsh plugin --profile web add github:Dehowy/dsh-model-master-badges`           | 否（纯 JS，无构建步骤） |
+| **tarball** | `dsh plugin --profile web add ./dsh-model-master-1.1.2.tgz`                    | 否（预构建产物）        |
+| **本地目录** | `dsh plugin --profile web add ./dsh-model-master-badges`                       | 否                    |
 
-因为本仓库是纯 JS、无构建步骤，git 安装虽然能跑，但**推荐 npm 或 tarball** —— 用户不必授予任何安装期脚本权限。
+> 上游那套 `add dsh-model-master`（走 npm registry）在这里**不可用** —— 本 fork 没发布到 npm，那个 spec 装的是上游原版。
+
+下面关于「发布到 npm」的几节是上游的发布流程，保留下来是为了将来真要发布时照着做；**本 fork 目前不走这条路**，所以这里的 `files[]`、`prepublish` 校验等描述对本仓库只是参考。
 
 ### 发布到 npm
 
