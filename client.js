@@ -180,8 +180,6 @@ window.__ModuleLoader__.load({
       clearRowTitle: '清除该模型的测速记录',
       clearRowAria: '清除 {0} 的测速记录',
       closeTitle: '关闭 (Esc)',
-      authorLabel: '我',
-      authorStarTip: '点个',
       updateBadge: '有新版本 {0}',
       updateAvailableTip: '发现新版本 {0}，点击查看',
       updateChecking: '正在检查更新…',
@@ -198,7 +196,6 @@ window.__ModuleLoader__.load({
       groupAllModels: '全部模型',
       scopeGroup: '「{0}」',
       boardName: 'TOP100',
-      boardBtnTitle: '全球百强榜（Top 100，纯展示，点击行可搜索本机同名渠道）',
       scrollLeft: '向左滚动',
       scrollRight: '向右滚动',
       loadingCatalog: '正在加载渠道与模型目录…（DSH 刚启动时渠道初始化约需数秒）',
@@ -294,13 +291,6 @@ window.__ModuleLoader__.load({
       boardSourceDATip: '打开 Design Arena 官方排行榜 —— Elo 盲测分的原始出处'
     }
 
-    // The author's avatar, inlined as a data URI: the header must not make a
-    // network request, and Bilibili's CDN refuses hot-linked images anyway.
-    var AUTHOR_AVATAR =
-      'data:image/jpeg;base64,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'
-    var AUTHOR_BILI_URL = 'https://space.bilibili.com/3747570931207293'
-    var AUTHOR_REPO_URL = 'https://github.com/NEETnina/dsh-model-master'
-
     var I18N = { zh: I18N_ZH }
 
     I18N.en = {
@@ -337,8 +327,6 @@ window.__ModuleLoader__.load({
       clearRowTitle: "Clear this model's probe result",
       clearRowAria: 'Clear probe result of {0}',
       closeTitle: 'Close (Esc)',
-      authorLabel: 'Me',
-      authorStarTip: 'Star it',
       updateBadge: 'v{0} available',
       updateAvailableTip: 'Version {0} is available — click to view',
       updateChecking: 'Checking for updates…',
@@ -355,7 +343,6 @@ window.__ModuleLoader__.load({
       groupAllModels: 'All models',
       scopeGroup: '\"{0}\"',
       boardName: 'TOP100',
-      boardBtnTitle: 'Global Top 100 (display-only; click a row to search local channels)',
       scrollLeft: 'Scroll left',
       scrollRight: 'Scroll right',
       loadingCatalog: 'Loading providers & models… (providers take seconds after a DSH start)',
@@ -486,8 +473,6 @@ window.__ModuleLoader__.load({
       clearRowTitle: 'このモデルの計測結果を削除',
       clearRowAria: '{0} の計測結果を削除',
       closeTitle: '閉じる (Esc)',
-      authorLabel: '私',
-      authorStarTip: 'スター',
       updateBadge: 'v{0} が利用可能',
       updateAvailableTip: '新しいバージョン {0} があります。クリックして表示',
       updateChecking: '更新を確認中…',
@@ -504,7 +489,6 @@ window.__ModuleLoader__.load({
       groupAllModels: '全モデル',
       scopeGroup: '「{0}」',
       boardName: 'TOP100',
-      boardBtnTitle: '世界トップ100（表示専用、行クリックでローカル検索）',
       scrollLeft: '左へスクロール',
       scrollRight: '右へスクロール',
       loadingCatalog: 'プロバイダーとモデル一覧を読み込み中…（DSH起動直後は数秒かかります）',
@@ -634,8 +618,6 @@ window.__ModuleLoader__.load({
       clearRowTitle: '이 모델의 측정 기록 삭제',
       clearRowAria: '{0}의 측정 기록 삭제',
       closeTitle: '닫기 (Esc)',
-      authorLabel: '我',
-      authorStarTip: '별',
       updateBadge: 'v{0} 사용 가능',
       updateAvailableTip: '새 버전 {0}이(가) 있습니다. 클릭하여 확인',
       updateChecking: '업데이트 확인 중…',
@@ -652,7 +634,6 @@ window.__ModuleLoader__.load({
       groupAllModels: '전체 모델',
       scopeGroup: '\"{0}\"',
       boardName: 'TOP100',
-      boardBtnTitle: '글로벌 톱100 (표시 전용, 행 클릭으로 로컬 검색)',
       scrollLeft: '왼쪽 스크롤',
       scrollRight: '오른쪽 스크롤',
       loadingCatalog: '제공자·모델 목록 로딩 중… (DSH 시작 직후 몇 초 소요)',
@@ -782,8 +763,6 @@ window.__ModuleLoader__.load({
       clearRowTitle: 'Messergebnis dieses Modells löschen',
       clearRowAria: 'Messergebnis von {0} löschen',
       closeTitle: 'Schließen (Esc)',
-      authorLabel: 'Ich',
-      authorStarTip: 'Stern',
       updateBadge: 'v{0} verfügbar',
       updateAvailableTip: 'Version {0} ist verfügbar – zum Ansehen klicken',
       updateChecking: 'Suche nach Updates…',
@@ -800,7 +779,6 @@ window.__ModuleLoader__.load({
       groupAllModels: 'Alle Modelle',
       scopeGroup: '„{0}\"',
       boardName: 'TOP100',
-      boardBtnTitle: 'Welt-Top 100 (nur Ansicht; Zeile klicken für lokale Suche)',
       scrollLeft: 'Nach links',
       scrollRight: 'Nach rechts',
       loadingCatalog: 'Anbieter & Modelle werden geladen… (nach DSH-Start einige Sekunden)',
@@ -931,8 +909,6 @@ window.__ModuleLoader__.load({
       clearRowTitle: 'Effacer le résultat de ce modèle',
       clearRowAria: 'Effacer le résultat de {0}',
       closeTitle: 'Fermer (Échap)',
-      authorLabel: 'Moi',
-      authorStarTip: 'Étoile',
       updateBadge: 'v{0} disponible',
       updateAvailableTip: 'La version {0} est disponible — cliquez pour voir',
       updateChecking: 'Recherche de mises à jour…',
@@ -949,7 +925,6 @@ window.__ModuleLoader__.load({
       groupAllModels: 'Tous les modèles',
       scopeGroup: '« {0} »',
       boardName: 'TOP100',
-      boardBtnTitle: 'Top 100 mondial (affichage seul ; cliquer une ligne pour chercher en local)',
       scrollLeft: 'Défiler à gauche',
       scrollRight: 'Défiler à droite',
       loadingCatalog: 'Chargement des fournisseurs et modèles… (quelques secondes après un démarrage de DSH)',
@@ -1081,8 +1056,6 @@ window.__ModuleLoader__.load({
       clearRowTitle: 'Borrar el resultado de este modelo',
       clearRowAria: 'Borrar resultado de {0}',
       closeTitle: 'Cerrar (Esc)',
-      authorLabel: 'Yo',
-      authorStarTip: 'Estrella',
       updateBadge: 'v{0} disponible',
       updateAvailableTip: 'La versión {0} está disponible — haz clic para ver',
       updateChecking: 'Buscando actualizaciones…',
@@ -1099,7 +1072,6 @@ window.__ModuleLoader__.load({
       groupAllModels: 'Todos los modelos',
       scopeGroup: '«{0}»',
       boardName: 'TOP100',
-      boardBtnTitle: 'Top 100 mundial (solo lectura; pulsa una fila para buscar canales locales)',
       scrollLeft: 'Desplazar a la izquierda',
       scrollRight: 'Desplazar a la derecha',
       loadingCatalog: 'Cargando proveedores y modelos… (tarda segundos tras iniciar DSH)',
@@ -1231,8 +1203,6 @@ window.__ModuleLoader__.load({
       clearRowTitle: 'Excluir o resultado deste modelo',
       clearRowAria: 'Excluir resultado de {0}',
       closeTitle: 'Fechar (Esc)',
-      authorLabel: 'Eu',
-      authorStarTip: 'Estrela',
       updateBadge: 'v{0} disponível',
       updateAvailableTip: 'A versão {0} está disponível — clique para ver',
       updateChecking: 'Procurando atualizações…',
@@ -1249,7 +1219,6 @@ window.__ModuleLoader__.load({
       groupAllModels: 'Todos os modelos',
       scopeGroup: '\"{0}\"',
       boardName: 'TOP100',
-      boardBtnTitle: 'Top 100 mundial (somente exibição; clique na linha para buscar canais locais)',
       scrollLeft: 'Rolar à esquerda',
       scrollRight: 'Rolar à direita',
       loadingCatalog: 'Carregando provedores e modelos… (leva segundos após iniciar o DSH)',
@@ -1381,8 +1350,6 @@ window.__ModuleLoader__.load({
       clearRowTitle: 'Удалить результат этой модели',
       clearRowAria: 'Удалить результат {0}',
       closeTitle: 'Закрыть (Esc)',
-      authorLabel: 'Я',
-      authorStarTip: 'Звезда',
       updateBadge: 'доступна v{0}',
       updateAvailableTip: 'Доступна версия {0} — нажмите, чтобы посмотреть',
       updateChecking: 'Проверка обновлений…',
@@ -1399,7 +1366,6 @@ window.__ModuleLoader__.load({
       groupAllModels: 'Все модели',
       scopeGroup: '«{0}»',
       boardName: 'TOP100',
-      boardBtnTitle: 'Мировой топ-100 (только просмотр; клик по строке — локальный поиск)',
       scrollLeft: 'Прокрутить влево',
       scrollRight: 'Прокрутить вправо',
       loadingCatalog: 'Загрузка провайдеров и моделей… (после старта DSH — несколько секунд)',
@@ -1531,8 +1497,6 @@ window.__ModuleLoader__.load({
       clearRowTitle: 'مسح نتيجة هذا النموذج',
       clearRowAria: 'مسح نتيجة {0}',
       closeTitle: 'إغلاق (Esc)',
-      authorLabel: 'أنا',
-      authorStarTip: 'نجمة',
       updateBadge: 'الإصدار {0} متاح',
       updateAvailableTip: 'الإصدار {0} متاح — انقر للعرض',
       updateChecking: 'جارٍ التحقق من التحديثات…',
@@ -1549,7 +1513,6 @@ window.__ModuleLoader__.load({
       groupAllModels: 'كل النماذج',
       scopeGroup: '«{0}»',
       boardName: 'TOP100',
-      boardBtnTitle: 'أفضل 100 عالميًا (للعرض فقط؛ انقر صفًا للبحث في القنوات المحلية)',
       scrollLeft: 'تمرير لليسار',
       scrollRight: 'تمرير لليمين',
       loadingCatalog: 'تحميل المزودين والنماذج… (بعد بدء DSH يستغرق ثوانٍ)',
@@ -1679,8 +1642,6 @@ window.__ModuleLoader__.load({
       clearRowTitle: 'इस मॉडल का परिणाम मिटाएँ',
       clearRowAria: '{0} का परिणाम मिटाएँ',
       closeTitle: 'बंद करें (Esc)',
-      authorLabel: 'मैं',
-      authorStarTip: 'स्टार',
       updateBadge: 'v{0} उपलब्ध',
       updateAvailableTip: 'संस्करण {0} उपलब्ध है — देखने के लिए क्लिक करें',
       updateChecking: 'अपडेट की जाँच हो रही है…',
@@ -1697,7 +1658,6 @@ window.__ModuleLoader__.load({
       groupAllModels: 'सभी मॉडल',
       scopeGroup: '\"{0}\"',
       boardName: 'TOP100',
-      boardBtnTitle: 'वैश्विक शीर्ष 100 (केवल प्रदर्शन; स्थानीय खोज हेतु पंक्ति पर क्लिक)',
       scrollLeft: 'बाएँ स्क्रॉल',
       scrollRight: 'दाएँ स्क्रॉल',
       loadingCatalog: 'प्रदाता व मॉडल लोड हो रहे हैं… (DSH शुरू होने के बाद कुछ सेकंड)',
@@ -1827,8 +1787,6 @@ window.__ModuleLoader__.load({
       clearRowTitle: 'এই মডেলের ফলাফল মুছুন',
       clearRowAria: '{0}-এর ফলাফল মুছুন',
       closeTitle: 'বন্ধ (Esc)',
-      authorLabel: 'আমি',
-      authorStarTip: 'স্টার',
       updateBadge: 'v{0} উপলব্ধ',
       updateAvailableTip: 'সংস্করণ {0} উপলব্ধ — দেখতে ক্লিক করুন',
       updateChecking: 'আপডেট যাচাই করা হচ্ছে…',
@@ -1845,7 +1803,6 @@ window.__ModuleLoader__.load({
       groupAllModels: 'সব মডেল',
       scopeGroup: '\"{0}\"',
       boardName: 'TOP100',
-      boardBtnTitle: 'বিশ্ব সেরা ১০০ (শুধু প্রদর্শন; স্থানীয় খোঁজে সারিতে ক্লিক)',
       scrollLeft: 'বামে স্ক্রল',
       scrollRight: 'ডানে স্ক্রল',
       loadingCatalog: 'প্রোভাইডার ও মডেল লোড হচ্ছে… (DSH শুরুর পরে কয়েক সেকেন্ড)',
@@ -1976,8 +1933,6 @@ window.__ModuleLoader__.load({
       clearRowTitle: 'اس ماڈل کا نتیجہ حذف کریں',
       clearRowAria: '{0} کا نتیجہ حذف کریں',
       closeTitle: 'بند کریں (Esc)',
-      authorLabel: 'میں',
-      authorStarTip: 'اسٹار',
       updateBadge: 'v{0} دستیاب',
       updateAvailableTip: 'ورژن {0} دستیاب ہے — دیکھنے کے لیے کلک کریں',
       updateChecking: 'اپ ڈیٹ کی جانچ ہو رہی ہے…',
@@ -1994,7 +1949,6 @@ window.__ModuleLoader__.load({
       groupAllModels: 'تمام ماڈل',
       scopeGroup: '\"{0}\"',
       boardName: 'TOP100',
-      boardBtnTitle: 'عالمی سرفہرست 100 (صرف نمائش؛ مقامی تلاش کے لیے قطار پر کلک)',
       scrollLeft: 'بائیں سکرول',
       scrollRight: 'دائیں سکرول',
       loadingCatalog: 'فراہم کنندگان اور ماڈل لوڈ ہو رہے ہیں… (DSH شروع ہونے کے بعد چند سیکنڈ)',
@@ -2124,8 +2078,6 @@ window.__ModuleLoader__.load({
       clearRowTitle: 'Hapus hasil uji model ini',
       clearRowAria: 'Hapus hasil uji {0}',
       closeTitle: 'Tutup (Esc)',
-      authorLabel: 'Saya',
-      authorStarTip: 'Bintang',
       updateBadge: 'v{0} tersedia',
       updateAvailableTip: 'Versi {0} tersedia — klik untuk melihat',
       updateChecking: 'Memeriksa pembaruan…',
@@ -2142,7 +2094,6 @@ window.__ModuleLoader__.load({
       groupAllModels: 'Semua model',
       scopeGroup: '\"{0}\"',
       boardName: 'TOP100',
-      boardBtnTitle: '100 besar dunia (hanya tampilan; klik baris untuk cari kanal lokal)',
       scrollLeft: 'Gulir kiri',
       scrollRight: 'Gulir kanan',
       loadingCatalog: 'Memuat penyedia & model… (beberapa detik setelah DSH mulai)',
@@ -2272,8 +2223,6 @@ window.__ModuleLoader__.load({
       clearRowTitle: 'Bu modelin ölçüm sonucunu sil',
       clearRowAria: '{0} ölçüm sonucunu sil',
       closeTitle: 'Kapat (Esc)',
-      authorLabel: 'Ben',
-      authorStarTip: 'Yıldız',
       updateBadge: 'v{0} mevcut',
       updateAvailableTip: '{0} sürümü mevcut — görüntülemek için tıklayın',
       updateChecking: 'Güncellemeler denetleniyor…',
@@ -2290,7 +2239,6 @@ window.__ModuleLoader__.load({
       groupAllModels: 'Tüm modeller',
       scopeGroup: '\"{0}\"',
       boardName: 'TOP100',
-      boardBtnTitle: 'Dünya ilk 100 (yalnızca gösterim; yerel arama için satıra tıkla)',
       scrollLeft: 'Sola kaydır',
       scrollRight: 'Sağa kaydır',
       loadingCatalog: 'Sağlayıcılar ve modeller yükleniyor… (DSH başlangıcından sonra birkaç sn)',
@@ -2546,21 +2494,6 @@ window.__ModuleLoader__.load({
       }
       /* Light-theme overrides: warm accents (gold/amber/purple) tuned for
          white backgrounds — the dark-theme hues fail WCAG contrast on light */
-      .dmm-modal[data-theme="light"] .dmm-header-lb-btn {
-        color: #a16207;
-        border-color: rgba(161, 98, 7, 0.35);
-        background: rgba(234, 179, 8, 0.1);
-      }
-      .dmm-modal[data-theme="light"] .dmm-header-lb-btn:hover {
-        color: #854d0e;
-        border-color: rgba(133, 77, 14, 0.55);
-        background: rgba(234, 179, 8, 0.18);
-      }
-      .dmm-modal[data-theme="light"] .dmm-header-lb-btn.active {
-        color: #854d0e;
-        border-color: #a16207;
-        background: rgba(234, 179, 8, 0.22);
-      }
       .dmm-modal[data-theme="light"] .dmm-rank-1 { color: #a16207; }
       .dmm-modal[data-theme="light"] .dmm-lb-stale { color: #b45309; }
       .dmm-modal[data-theme="light"] .dmm-tag-reasoning {
@@ -2631,82 +2564,6 @@ window.__ModuleLoader__.load({
         display: flex;
         align-items: center;
         gap: 10px;
-      }
-
-      /* ── Author credits: avatar + "give it a star" ── */
-      .dmm-author {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        flex-shrink: 0;
-      }
-      .dmm-avatar-link {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 26px;
-        height: 26px;
-        border-radius: 50%;
-        overflow: hidden;
-        border: 1px solid var(--dmm-border);
-        box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06) inset;
-        transition:
-          transform 0.14s ease,
-          border-color 0.14s ease,
-          box-shadow 0.14s ease;
-        flex-shrink: 0;
-      }
-      .dmm-avatar-link:hover {
-        border-color: var(--dmm-accent);
-        box-shadow:
-          0 0 0 1px rgba(255, 255, 255, 0.06) inset,
-          0 0 0 3px var(--dmm-accent-soft-bg);
-        transform: scale(1.08);
-      }
-      .dmm-avatar-img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        display: block;
-        border-radius: 50%;
-      }
-      .dmm-star-btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 4px;
-        height: 26px;
-        padding: 0 10px;
-        border-radius: 13px;
-        border: 1px solid transparent;
-        background: linear-gradient(135deg, #3b82f6, #2563eb);
-        color: #fff;
-        font-size: 11.5px;
-        font-weight: 600;
-        line-height: 1;
-        letter-spacing: 0;
-        cursor: pointer;
-        text-decoration: none;
-        white-space: nowrap;
-        box-shadow: 0 1px 2px rgba(37, 99, 235, 0.35);
-        transition: filter 0.14s ease, transform 0.14s ease, box-shadow 0.14s ease;
-      }
-      .dmm-star-btn:hover {
-        filter: brightness(1.1);
-        transform: translateY(-1px);
-        box-shadow: 0 3px 8px rgba(37, 99, 235, 0.45);
-      }
-      .dmm-star-btn:active {
-        transform: translateY(0);
-        filter: brightness(0.97);
-      }
-      .dmm-star-btn:focus-visible {
-        outline: 2px solid var(--dmm-accent);
-        outline-offset: 2px;
-      }
-      .dmm-star-btn svg {
-        flex-shrink: 0;
-        filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.55));
       }
 
       /* ── Update indicator ──
@@ -3113,32 +2970,6 @@ window.__ModuleLoader__.load({
         color: var(--dmm-accent);
         background: var(--dmm-accent-soft-border);
         font-weight: 600;
-      }
-
-      /* ── Leaderboard entry button (header, grouped with actions) ── */
-      .dmm-header-lb-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        height: 26px;
-        padding: 0 12px;
-        border-radius: 999px;
-        border: 1px solid rgba(234, 179, 8, 0.35);
-        background: rgba(234, 179, 8, 0.08);
-        color: #eab308;
-        font-size: 11px;
-        font-weight: 600;
-        cursor: pointer;
-        white-space: nowrap;
-        transition: all 0.12s ease;
-      }
-      .dmm-header-lb-btn:hover {
-        border-color: rgba(234, 179, 8, 0.65);
-        background: rgba(234, 179, 8, 0.14);
-      }
-      .dmm-header-lb-btn.active {
-        background: rgba(234, 179, 8, 0.2);
-        border-color: #eab308;
       }
 
       /* ── Content List & Wide Scrollbar ── */
@@ -3864,11 +3695,6 @@ window.__ModuleLoader__.load({
       h('line', { key: 'h', x1: 18.36, y1: 5.64, x2: 19.78, y2: 4.22 })
     ])
     const IcoMoon = mkIcon([h('path', { key: 'm', d: 'M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z' })])
-    const IcoPodium = mkIcon([
-      h('line', { key: 'a', x1: 18, y1: 20, x2: 18, y2: 10 }),
-      h('line', { key: 'b', x1: 12, y1: 20, x2: 12, y2: 4 }),
-      h('line', { key: 'c', x1: 6, y1: 20, x2: 6, y2: 14 })
-    ])
     const IcoTrash = mkIcon([
       h('polyline', { key: 'a', points: '3 6 5 6 21 6' }),
       h('path', { key: 'b', d: 'M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2' }),
@@ -4494,43 +4320,6 @@ window.__ModuleLoader__.load({
                       ? t('catalogLoadingSub')
                       : `· ${groups.length} 个渠道 · ${allModelEntries.length} 款模型`
                   )
-                ),
-                // Author credits: avatar opens the Bilibili space, the blue
-                // pill opens the GitHub repo. Both are plain anchors so the
-                // browser handles them natively (new tab, middle click, etc.).
-                h(
-                  'div',
-                  { className: 'dmm-author' },
-                  h(
-                    'a',
-                    {
-                      className: 'dmm-avatar-link',
-                      href: AUTHOR_BILI_URL,
-                      target: '_blank',
-                      rel: 'noopener noreferrer',
-                      title: t('authorLabel'),
-                      'aria-label': t('authorLabel')
-                    },
-                    h('img', { className: 'dmm-avatar-img', src: AUTHOR_AVATAR, alt: '' })
-                  ),
-                  h(
-                    'a',
-                    {
-                      className: 'dmm-star-btn',
-                      href: AUTHOR_REPO_URL,
-                      target: '_blank',
-                      rel: 'noopener noreferrer',
-                      title: t('authorStarTip')
-                    },
-                    t('authorStarTip'),
-                    h(
-                      'svg',
-                      { width: 11, height: 11, viewBox: '0 0 24 24', fill: 'currentColor', 'aria-hidden': 'true' },
-                      h('path', {
-                        d: 'M12 2.6l2.9 5.9 6.5.95-4.7 4.58 1.1 6.47L12 17.5l-5.8 3.05 1.1-6.47-4.7-4.58 6.5-.95z'
-                      })
-                    )
-                  )
                 )
               ),
               h(
@@ -4610,28 +4399,6 @@ window.__ModuleLoader__.load({
                     )
                   )
                 })(),
-                // Leaderboard entry grouped with the other header actions.
-                // Highlight only when the board is actually on screen (a
-                // search takes over the content area); clicking always
-                // reveals the board by clearing any active search.
-                h(
-                  'button',
-                  {
-                    className: `dmm-header-lb-btn ${activeTab === 'leaderboard' && !String(searchQuery || '').trim() ? 'active' : ''}`,
-                    title: t('boardBtnTitle'),
-                    onClick: () => {
-                      if (String(searchQuery || '').trim()) {
-                        setSearchQuery('')
-                        setActiveTab('leaderboard')
-                      } else {
-                        setActiveTab(activeTab === 'leaderboard' ? 'all' : 'leaderboard')
-                      }
-                      setHighlightedIndex(-1)
-                    }
-                  },
-                  IcoPodium(12),
-                  'TOP100'
-                ),
                 // Single sun/moon toggle — the icon mirrors the CURRENT theme
                 h(
                   'button',
