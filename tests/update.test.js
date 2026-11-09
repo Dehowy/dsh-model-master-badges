@@ -18,7 +18,13 @@ import { fileURLToPath } from 'node:url'
 
 import { __internals } from '../index.js'
 
-const { parseVersion, compareVersions, resolveUpdatePayload, UPDATE_MIN_INTERVAL_MS } = __internals
+const {
+  parseVersion,
+  compareVersions,
+  resolveUpdatePayload,
+  UPDATE_MIN_INTERVAL_MS,
+  UPDATE_REPO_SLUG
+} = __internals
 
 const here = path.dirname(fileURLToPath(import.meta.url))
 const HOST = fs.readFileSync(path.join(here, '..', 'index.js'), 'utf8')
@@ -192,6 +198,10 @@ test('a cached check is recomputed against the installed version', () => {
         releaseUrl: 'https://example.invalid/release',
         sourceKind: 'live',
         checkedAt: Date.now(),
+        // A cache only counts if it describes this repository. Real caches
+        // always carry the slug, so the fixture must too — without it the
+        // payload is (correctly) treated as somebody else's answer.
+        repoSlug: UPDATE_REPO_SLUG,
         ...extra
       })
     )
@@ -234,7 +244,8 @@ test('a fallback-sourced answer expires sooner than an API one', () => {
         hasUpdate: false,
         sourceKind: 'live',
         via,
-        checkedAt: Date.now() - ageMs
+        checkedAt: Date.now() - ageMs,
+        repoSlug: UPDATE_REPO_SLUG
       })
     )
 
@@ -252,6 +263,51 @@ test('a fallback-sourced answer expires sooner than an API one', () => {
   const payload = resolveUpdatePayload(tmpDir)
   assert.equal(payload.via, 'redirect')
   assert.equal(payload.stale, false, 'a brand-new fallback answer is still current')
+})
+
+test('a cache written against another repository is ignored', () => {
+  // The bug this guards: this fork points update-check at its own repository,
+  // but the cache file outlives the change. A cache written before the switch —
+  // or by any build checking a different repo — still carries that repo's
+  // release URL and notes. `hasUpdate` gets recomputed from the version, so the
+  // badge would look right, but the link the user clicks would belong to
+  // somebody else's project. Drop the whole cache instead.
+  const writeCache = extra =>
+    fs.writeFileSync(
+      path.join(tmpDir, 'update-check.json'),
+      JSON.stringify({
+        latest: '99.0.0',
+        hasUpdate: true,
+        releaseUrl: 'https://github.com/someone-else/other-project/releases/tag/v99.0.0',
+        releaseNotes: 'notes from another project',
+        sourceKind: 'live',
+        checkedAt: Date.now(),
+        ...extra
+      })
+    )
+
+  // Written by a build that checked upstream's repository: no slug at all.
+  writeCache({})
+  let payload = resolveUpdatePayload(tmpDir)
+  assert.equal(payload.sourceKind, 'pending', 'a slug-less cache must read as "never checked"')
+  assert.equal(payload.latest, null, 'a slug-less cache must not supply a version')
+  assert.equal(payload.releaseUrl, null, 'a slug-less cache must not supply a release link')
+  assert.equal(payload.hasUpdate, null, 'a slug-less cache cannot support a verdict')
+  assert.equal(payload.stale, true, 'a slug-less cache must force a refresh')
+
+  // Written for an explicitly different repository (e.g. the upstream slug).
+  writeCache({ repoSlug: 'NEETnina/dsh-model-master' })
+  payload = resolveUpdatePayload(tmpDir)
+  assert.equal(payload.sourceKind, 'pending', 'a foreign-slug cache must read as "never checked"')
+  assert.equal(payload.releaseUrl, null, 'a foreign-slug cache must not supply a release link')
+
+  // Its own cache is still honoured — the guard must not throw away good data.
+  writeCache({ repoSlug: UPDATE_REPO_SLUG })
+  payload = resolveUpdatePayload(tmpDir)
+  assert.equal(payload.sourceKind, 'live', 'a cache for this repository must still be used')
+  assert.equal(payload.latest, '99.0.0')
+  assert.equal(payload.hasUpdate, true, 'and it must still produce a verdict')
+  assert.equal(payload.stale, false)
 })
 
 test('the client treats null hasUpdate as unknown, not as up to date', () => {

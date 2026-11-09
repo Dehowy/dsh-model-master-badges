@@ -612,7 +612,12 @@ function checkForUpdateShared(dataDir, { force = false, currentVersion = null } 
     .then(result => {
       updateLastAt = Date.now()
       updateLastVia = result?.via ?? null
-      const stamped = { ...result, checkedAt: updateLastAt, currentVersion }
+      // `repoSlug` records which repository this answer describes. Without it a
+      // cache written before the checker was pointed elsewhere stays valid for
+      // the full six hours and keeps showing the previous repository's release
+      // link — the version comparison would be recomputed but `releaseUrl` is
+      // taken from the cache verbatim.
+      const stamped = { ...result, checkedAt: updateLastAt, currentVersion, repoSlug: UPDATE_REPO_SLUG }
       saveUpdateCache(dataDir, stamped)
       return stamped
     })
@@ -633,34 +638,42 @@ function checkForUpdateShared(dataDir, { force = false, currentVersion = null } 
 function resolveUpdatePayload(dataDir) {
   const current = readOwnVersion()
   const cached = loadUpdateCache(dataDir)
+  // A cache written by a build that checked a different repository describes a
+  // different project. Treat it as absent: `hasUpdate` is recomputed from the
+  // version anyway, but `releaseUrl`, `releaseNotes` and `publishedAt` come
+  // straight out of the cache, so keeping it would offer the user a link to
+  // somebody else's release. Older caches carry no `repoSlug` at all, which is
+  // exactly the case that has to be dropped.
+  const belongsHere = !!cached && cached.repoSlug === UPDATE_REPO_SLUG
+  const usable = belongsHere ? cached : null
   // A fallback-sourced answer expires sooner, so the authoritative source gets
   // re-asked rather than being trusted for six hours (see UPDATE_FALLBACK_TTL_MS).
-  const isFresh = cached && Date.now() - (cached.checkedAt ?? 0) < freshnessWindowMs(cached.via)
+  const isFresh = !!usable && Date.now() - (usable.checkedAt ?? 0) < freshnessWindowMs(usable.via)
 
   // Recompute against the version actually installed right now: the user may
   // have updated since this cache was written, which would otherwise keep
   // showing an update badge for a release they already run.
   let hasUpdate = null
-  if (cached && typeof cached.latest === 'string' && current) {
-    const cmp = compareVersions(cached.latest, current)
+  if (usable && typeof usable.latest === 'string' && current) {
+    const cmp = compareVersions(usable.latest, current)
     hasUpdate = cmp === null ? null : cmp > 0
   }
 
   return {
     current,
-    latest: cached?.latest ?? null,
+    latest: usable?.latest ?? null,
     hasUpdate,
-    releaseUrl: cached?.releaseUrl ?? null,
-    releaseNotes: cached?.releaseNotes ?? null,
-    publishedAt: cached?.publishedAt ?? null,
+    releaseUrl: usable?.releaseUrl ?? null,
+    releaseNotes: usable?.releaseNotes ?? null,
+    publishedAt: usable?.publishedAt ?? null,
     // 'pending' means "never checked yet"; the UI shows a checking state rather
     // than claiming the install is current.
-    sourceKind: cached?.sourceKind ?? 'pending',
+    sourceKind: usable?.sourceKind ?? 'pending',
     // Which source answered: 'api' or 'redirect'. Useful when a check fails on
     // one path but not the other.
-    via: cached?.via ?? null,
-    error: cached?.error ?? null,
-    checkedAt: cached?.checkedAt ?? null,
+    via: usable?.via ?? null,
+    error: usable?.error ?? null,
+    checkedAt: usable?.checkedAt ?? null,
     stale: !isFresh
   }
 }

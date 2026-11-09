@@ -35,7 +35,8 @@ fs.writeFileSync(
   })
 )
 
-const { apply } = await import('../index.js')
+const { apply, __internals } = await import('../index.js')
+const { UPDATE_REPO_SLUG } = __internals
 
 let handler = null
 const fakeCtx = {
@@ -129,7 +130,10 @@ test('a cached newer release surfaces as an available update', async () => {
       publishedAt: Date.now(),
       sourceKind: 'live',
       error: null,
-      checkedAt: Date.now()
+      checkedAt: Date.now(),
+      // Real caches name the repository they describe; one that does not is
+      // dropped by resolveUpdatePayload, so the fixture has to carry it.
+      repoSlug: UPDATE_REPO_SLUG
     })
   )
   const res = await request('/api/model-master/update')
@@ -149,7 +153,8 @@ test('a failed check is reported, never disguised as current', async () => {
       releaseUrl: null,
       sourceKind: 'offline',
       error: 'Request timed out',
-      checkedAt: Date.now()
+      checkedAt: Date.now(),
+      repoSlug: UPDATE_REPO_SLUG
     })
   )
   const res = await request('/api/model-master/update')
