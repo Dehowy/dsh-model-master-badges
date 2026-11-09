@@ -13,8 +13,8 @@
   "scripts": {
     "test": "node tests/run.mjs",
     "pack": "node tools/pack.mjs",
-    "install": "node tools/install.mjs",
-    "rollback": "node tools/rollback.mjs",
+    "fork:install": "node tools/install.mjs",
+    "fork:rollback": "node tools/rollback.mjs",
     "format": "prettier --write \"*.js\" \"tests/*.js\" \"*.md\" \"*.json\" \"*.yml\"",
     "format:check": "prettier --check \"*.js\" \"tests/*.js\" \"*.md\" \"*.json\" \"*.yml\""
   },

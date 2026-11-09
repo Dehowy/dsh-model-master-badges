@@ -115,5 +115,51 @@ console.log('\n== getCatalog keeps the badge ==')
   }
 }
 
+console.log('\n== the published manifest cannot run scripts a consumer lacks files for ==')
+{
+  // Regression guard for a real defect: `scripts.install` is the npm lifecycle
+  // hook, so every consumer of the tarball executed `node tools/install.mjs` — but
+  // tools/ is intentionally absent from files[], so that path never existed in the
+  // package. Installing the fork failed outright until the key was renamed.
+  const pkg = JSON.parse(readPlugin('package.json'))
+  const LIFECYCLE = [
+    'preinstall',
+    'install',
+    'postinstall',
+    'prepare',
+    'prepublish',
+    'prepublishOnly',
+    'prepack',
+    'postpack',
+    'dependencies',
+    'preversion',
+    'version',
+    'postversion',
+  ]
+  const collisions = Object.keys(pkg.scripts || {}).filter(k => LIFECYCLE.includes(k))
+  ok(collisions.length === 0, 'no script is named after an npm lifecycle event', `collisions: ${collisions.join(', ')}`)
+
+  // Those entry points must still exist, just under names npm will not auto-run.
+  ok(typeof pkg.scripts?.['fork:install'] === 'string', 'the fork installer is reachable as fork:install')
+  ok(typeof pkg.scripts?.['fork:rollback'] === 'string', 'the fork rollback is reachable as fork:rollback')
+
+  // The manifest must not claim runtime files it does not ship: `main` and the
+  // declared bundle patch have to be real paths inside the repository root.
+  const fs = await import('node:fs')
+  ok(fs.existsSync(path.join(PLUGIN_DIR, pkg.main)), `main resolves (${pkg.main})`)
+  ok(
+    fs.existsSync(path.join(PLUGIN_DIR, pkg.dsh?.bundle?.patch ?? '')),
+    `dsh.bundle.patch resolves (${pkg.dsh?.bundle?.patch})`
+  )
+
+  // A published package must not name a version the plugin will then argue with
+  // itself about. update-check compares against the upstream repo, so the version
+  // has to stay a plain semver the comparator understands.
+  ok(
+    /^\d+\.\d+\.\d+(?:-[\w.]+)?$/.test(pkg.version),
+    `version is a plain semver (${pkg.version})`
+  )
+}
+
 console.log(`\n${fail === 0 ? 'PASS' : 'FAIL'}  ${pass} passed, ${fail} failed\n`)
 process.exit(fail === 0 ? 0 : 1)

@@ -2,16 +2,23 @@
 /**
  * Run the whole suite: this fork's checks plus upstream's own tests.
  *
- * Two kinds of file live here and they need different runners:
+ * Two kinds of file live here:
  *
  *   test-*.mjs      plain scripts; they print their own assertion lines and set
- *                   the exit code themselves, so run them directly.
- *   *.test.js       upstream's node:test files; they need `node --test` to report.
+ *                   the exit code themselves.
+ *   *.test.js       upstream's node:test files.
  *
- * Both are covered on purpose. Ours prove the badge wiring works; upstream's prove
- * the fork did not break the plugin's contract while removing the header widgets.
- * Running only one of the two would make "tests pass" a much weaker claim than it
- * sounds — that is exactly how a removed symbol reaches production.
+ * Both are executed as plain `node <file>`. Upstream's files work that way because
+ * node:test runs them in-process and still reports the usual `ℹ tests / pass / fail`
+ * summary and exits non-zero on failure. We deliberately avoid `node --test <file>`:
+ * that form spawns a child per file, and a sandboxed DSH workspace denies piped-stdio
+ * child processes (spawn EPERM), which turned all eight upstream files into one
+ * uniform `Error: spawn EPERM` unrelated to their assertions.
+ *
+ * Both kinds are covered on purpose. Ours prove the badge wiring works; upstream's
+ * prove the fork did not break the plugin's contract while removing the header
+ * widgets. Running only one of the two would make "tests pass" a much weaker claim
+ * than it sounds — that is exactly how a removed symbol reaches production.
  *
  * Each file gets its own process: a hang or a crash in one must not mask a real
  * failure in another, and the exit code has to reflect the worst file, not the
@@ -47,7 +54,7 @@ function run(label, args) {
 }
 
 console.log(`\n== upstream contract tests (${upstream.length} files) ==`)
-for (const file of upstream) run(file, ['--test', path.join(here, file)])
+for (const file of upstream) run(file, [path.join(here, file)])
 
 console.log(`\n== fork checks (${ours.length} files) ==`)
 for (const file of ours) run(file, [path.join(here, file)])

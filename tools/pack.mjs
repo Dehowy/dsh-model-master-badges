@@ -19,6 +19,25 @@ const pkg = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'))
 const REQUIRED_ALWAYS = ['index.js', 'client.js', 'package.json', 'cordis.patch.yml']
 const problems = []
 
+// Expand `files[]` into concrete paths. npm always includes package.json, and a
+// directory entry means "everything under it", which is the only glob we need.
+// Defined before the checks because 6b needs to know what the tarball ships.
+function expand(entries) {
+  const out = []
+  for (const entry of entries) {
+    const abs = path.join(root, entry)
+    const stat = fs.statSync(abs)
+    if (stat.isDirectory()) {
+      for (const child of fs.readdirSync(abs).sort()) {
+        out.push(...expand([`${entry.replace(/\/$/, '')}/${child}`]))
+      }
+    } else {
+      out.push(entry)
+    }
+  }
+  return out
+}
+
 // 1. Files the runtime cannot work without.
 for (const rel of REQUIRED_ALWAYS) {
   if (!fs.existsSync(path.join(root, rel))) problems.push(`missing required file: ${rel}`)
@@ -55,6 +74,54 @@ if (!fs.existsSync(path.join(root, 'FORK.md'))) {
 if (pkg.dsh?.client?.platform !== 'web') problems.push('package.json dsh.client.platform must be "web"')
 if (pkg.dsh?.bundle?.patch !== './cordis.patch.yml') problems.push('package.json dsh.bundle.patch must point at ./cordis.patch.yml')
 
+// 6. No script may share a name with an npm lifecycle event.
+//
+//    This one already bit us: the fork's own installer was named `install`, so
+//    npm treated it as the install lifecycle hook and ran `node tools/install.mjs`
+//    inside every consumer's install. `tools/` is deliberately not in `files[]`,
+//    so the script did not even exist there — the install died with ENOENT (or,
+//    in a sandbox, EPERM). A lifecycle-named script can never be safe here:
+//    npm/pnpm will run it in a tree where dev-only files are absent by design.
+const LIFECYCLE = new Set([
+  'preinstall',
+  'install',
+  'postinstall',
+  'prepare',
+  'prepublish',
+  'prepublishOnly',
+  'prepack',
+  'postpack',
+  'dependencies',
+  'preversion',
+  'version',
+  'postversion',
+])
+for (const key of Object.keys(pkg.scripts || {})) {
+  if (LIFECYCLE.has(key)) {
+    problems.push(
+      `package.json scripts.${key} collides with an npm lifecycle event — ` +
+        `consumers would execute it, but its files are not in files[] (rename it, e.g. fork:${key})`,
+    )
+  }
+}
+
+// 6b. Every script must point at a file this tarball actually ships. Dev-only
+//     scripts (tests, tools) are fine because they keep their non-lifecycle
+//     names, but a typo'd path is still worth catching here rather than in a
+//     consumer's terminal.
+const SHIPPED = new Set(
+  expand([...new Set(['package.json', ...(pkg.files || [])])]).map(rel => rel.replace(/\\/g, '/')),
+)
+for (const [key, cmd] of Object.entries(pkg.scripts || {})) {
+  for (const token of String(cmd).split(/\s+/)) {
+    if (!/^(tools|tests)\//.test(token)) continue
+    const rel = token.replace(/\.\.\//g, '')
+    if (!SHIPPED.has(rel) && !fs.existsSync(path.join(root, rel))) {
+      problems.push(`package.json scripts.${key} names a path that exists nowhere: ${token}`)
+    }
+  }
+}
+
 if (problems.length) {
   console.error('pack: refusing to build\n')
   for (const p of problems) console.error(`  - ${p}`)
@@ -68,24 +135,6 @@ fs.rmSync(dist, { recursive: true, force: true })
 fs.mkdirSync(dist, { recursive: true })
 const name = pkg.name.replace(/^@/, '').replace(/\//g, '-')
 const tarball = path.join(dist, `${name}-${pkg.version}.tgz`)
-
-// Expand `files[]` into concrete paths. npm always includes package.json, and a
-// directory entry means "everything under it", which is the only glob we need.
-function expand(entries) {
-  const out = []
-  for (const entry of entries) {
-    const abs = path.join(root, entry)
-    const stat = fs.statSync(abs)
-    if (stat.isDirectory()) {
-      for (const child of fs.readdirSync(abs).sort()) {
-        out.push(...expand([`${entry.replace(/\/$/, '')}/${child}`]))
-      }
-    } else {
-      out.push(entry)
-    }
-  }
-  return out
-}
 
 const archivePaths = expand([...new Set(['package.json', ...(pkg.files || [])])]).sort()
 const entries = archivePaths.map(rel => ({ path: rel, data: fs.readFileSync(path.join(root, rel)) }))
