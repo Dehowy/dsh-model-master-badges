@@ -92,6 +92,59 @@ window.__ModuleLoader__.load({
       } catch {}
     }
 
+    // ── Promo badge text ──────────────────────────────────────────────
+    // A provider adapter may attach `badge` to a model row (e.g. "夜间折扣",
+    // "限时免费"). The host's native picker resolves it through
+    // ctx.locale.resolveText, but this plugin deliberately does NOT inject the
+    // `locale` service — see the note near apply() explaining that declaring an
+    // optional-but-missing service can park the fiber in PENDING. So we resolve
+    // it locally with `uiLang`, mirroring the host's semantics:
+    //   chain: current locale -> its base -> 'en' (forced last), first value wins
+    // One deliberate difference: after the chain we fall back to ANY available
+    // translation. Upstreams usually ship {en, zh} only, and this plugin speaks
+    // 15 languages — an English label beats an empty capsule for, say, an
+    // Indonesian user.
+    function badgeText(badge) {
+      if (!badge) return ''
+      var raw = badge.text
+      if (typeof raw === 'string') return raw
+      if (!raw || typeof raw !== 'object') return ''
+      var lang = String(uiLang || 'zh').toLowerCase()
+      var keys = [lang]
+      var base = lang.split('-')[0]
+      if (base !== lang) keys.push(base)
+      if (keys.indexOf('en') === -1) keys.push('en')
+      for (var i = 0; i < keys.length; i++) {
+        var v = raw[keys[i]]
+        if (typeof v === 'string' && v) return v
+      }
+      var all = Object.keys(raw)
+      for (var j = 0; j < all.length; j++) {
+        var w = raw[all[j]]
+        if (typeof w === 'string' && w) return w
+      }
+      return ''
+    }
+
+    // The capsule geometry is copied from the host's Tag.module.css so the chip
+    // reads identically next to the native picker. `corner-shape: round` is NOT
+    // cosmetic: the theme injects a global superellipse, without it every
+    // border-radius renders as a squircle (see the same warning near CSS below).
+    // Truncation lives on the inner text span because text-overflow does not
+    // apply to an inline-flex container.
+    var BADGE_TONES = { neutral: 1, info: 1, success: 1, warning: 1 }
+    function renderModelBadge(badge) {
+      if (!badge) return null
+      var text = badgeText(badge)
+      if (!text) return null
+      var tone = BADGE_TONES[badge.tone] ? badge.tone : 'neutral'
+      return h(
+        'span',
+        { className: 'dmm-badge dmm-badge-' + tone, title: text },
+        h('span', { className: 'dmm-badge-text' }, text)
+      )
+    }
+
     // 中文基准字典（回退源）
     var I18N_ZH = {
       title: '模型选择',
@@ -3309,6 +3362,53 @@ window.__ModuleLoader__.load({
         font-weight: 500;
         flex-shrink: 0;
       }
+      /* Promo badge — host Tag geometry, copied from
+         @deepseek-ai/dsh-client-ui-primitives/lib/Tag.module.css so the chip
+         matches the native picker. Three deliberate departures from the host:
+           · max-width + inner truncation, because this row is tighter than the
+             native one (name + provider + Reasoning + speed pill + button);
+           · margin-left:-4px, because .dmm-card-left gap is 10px while the host
+             row gap is 4px — only the name/badge pair is tightened;
+           · corner-shape:round, required or the global superellipse squircle
+             distorts the capsule (same reason the note further below exists). */
+      .dmm-badge {
+        flex: none;
+        display: inline-flex;
+        align-items: center;
+        border-radius: 999px;
+        corner-shape: round;
+        padding: 1px 8px;
+        font-size: 11px;
+        line-height: 17px;
+        font-weight: 500;
+        white-space: nowrap;
+        max-width: 6em;
+        overflow: hidden;
+      }
+      .dmm-card-name + .dmm-badge {
+        margin-left: -4px;
+      }
+      .dmm-badge-text {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .dmm-badge-neutral {
+        color: var(--dsw-alias-label-secondary);
+        background: var(--dsw-alias-bg-module-platform);
+      }
+      .dmm-badge-info {
+        color: var(--dsw-alias-state-business-primary);
+        background: color-mix(in srgb, var(--dsw-alias-state-business-primary) 10%, transparent);
+      }
+      .dmm-badge-success {
+        color: var(--dsw-alias-state-success-primary);
+        background: color-mix(in srgb, var(--dsw-alias-state-success-primary) 10%, transparent);
+      }
+      .dmm-badge-warning {
+        color: var(--dsw-alias-state-warn-primary);
+        background: color-mix(in srgb, var(--dsw-alias-state-warn-primary) 12%, transparent);
+      }
       .dmm-card-right {
         display: flex;
         align-items: center;
@@ -4081,6 +4181,11 @@ window.__ModuleLoader__.load({
               modelId: mId,
               modelName: m.name || mId || t('unnamedModel'),
               reasoning: m.reasoning,
+              // Promo badge from the provider adapter. Named modelBadge (not
+              // badge) on purpose: the row renderers below already declare a
+              // local `const badge = formatSpeedBadge(entry.bench)`, which is
+              // the probe-speed pill — an unrelated thing with the same name.
+              modelBadge: m.badge || null,
               bench,
               group: g,
               model: m
@@ -4923,6 +5028,7 @@ window.__ModuleLoader__.load({
                                     'div',
                                     { className: 'dmm-card-left' },
                                     h('span', { className: 'dmm-card-name' }, entry.modelName),
+                                    renderModelBadge(entry.modelBadge),
                                     h('span', { className: 'dmm-card-provider' }, entry.providerName),
                                     entry.reasoning
                                       ? h(
@@ -5279,6 +5385,7 @@ window.__ModuleLoader__.load({
                                       'div',
                                       { className: 'dmm-card-left' },
                                       h('span', { className: 'dmm-card-name' }, entry.modelName),
+                                      renderModelBadge(entry.modelBadge),
                                       h('span', { className: 'dmm-card-provider' }, entry.providerName),
                                       entry.reasoning
                                         ? h(

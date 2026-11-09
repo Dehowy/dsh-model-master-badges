@@ -680,7 +680,12 @@ async function getCatalog(llmService, logger) {
           name: m.name || m.id,
           description: m.description,
           inputModalities: m.inputModalities,
-          reasoning: m.reasoning
+          reasoning: m.reasoning,
+          // Carry the promo badge (e.g. "夜间折扣" / "限时免费") through to the
+          // client. It is produced by provider adapters' listModels() and is
+          // the only channel the host forwards; dropping it here would leave
+          // the fallback catalog path permanently badge-less.
+          ...(m.badge === undefined ? {} : { badge: m.badge })
         }))
       }
     })
