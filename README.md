@@ -2,7 +2,7 @@
 
 > A Spotlight-style model switcher for **DeepSeek Harness (DSH)** — with real streaming speed probes, a live global leaderboard, and a 15-language UI.
 
-> **这是一个个人 fork，基于上游 v1.1.2，不打算合回上游。** 版本号从 `1.2.0` 起独立于上游。相对原版只有两处行为差异：
+> **这是一个个人 fork，基于上游 v1.1.2，不打算合回上游。** 版本号从 `1.2.0` 起独立于上游（当前 `1.2.1`）。相对原版只有两处行为差异：
 > ① 模型行显示渠道下发的促销小标签（夜间折扣 / 限时免费 / 订阅优先 / Pro Only 等）；
 > ② 去掉作者头像、「点个★」与 TOP100 按钮。详见 [FORK.md](./FORK.md)。
 > 因此下文凡提到「全球百强榜 / TOP100」的地方，**本 fork 里没有入口**（后端接口与面板渲染代码仍在，只是按钮已删）。
@@ -125,7 +125,7 @@ English / 中文 / हिन्दी / Español / Français / العربية / 
 
 需要 **DSH 与 Node.js ≥ 20**。
 
-> ⚠️ **这个 fork 没有发布到 npm，而且包名与上游相同（都叫 `dsh-model-master`）。** 版本号已独立为 `1.2.0`。
+> ⚠️ **这个 fork 没有发布到 npm，而且包名与上游相同（都叫 `dsh-model-master`）。** 版本号已独立（当前 `1.2.1`）。
 > 所以下面这条**装的是上游原版**，不是本 fork —— 你会得到 TOP100 按钮、作者头像，也看不到促销标签：
 >
 > ```bash
@@ -150,16 +150,16 @@ dsh plugin --profile web add github:Dehowy/dsh-model-master-badges
 
 ### 方式二：tarball
 
-从 [Releases](https://github.com/Dehowy/dsh-model-master-badges/releases) 下载 `dsh-model-master-1.2.0.tgz`，然后：
+从 [Releases](https://github.com/Dehowy/dsh-model-master-badges/releases) 下载当前版本的 `dsh-model-master-<version>.tgz`（`<version>` 是该 release 的 tag 去掉 `v`），然后：
 
 ```bash
-dsh plugin --profile web add ./dsh-model-master-1.2.0.tgz
+dsh plugin --profile web add ./dsh-model-master-<version>.tgz
 ```
 
 也可以自己打一个：
 
 ```bash
-npm run pack     # → dist/dsh-model-master-1.2.0.tgz（会先校验 manifest，再逐字节回读校验）
+npm run pack     # → dist/dsh-model-master-<version>.tgz（会先校验 manifest，再逐字节回读校验）
 ```
 
 ### 方式三：本地 clone 后装目录
@@ -198,9 +198,9 @@ dsh plugin --profile web remove dsh-model-master
 
 ### 关于「检查更新」
 
-本 fork 的版本号从 **1.2.0** 起独立于上游，更新检查对着**本仓库**（`Dehowy/dsh-model-master-badges`）的 release 比较。
+本 fork 的版本号从 **1.2.0** 起独立于上游（当前 **1.2.1**），更新检查对着**本仓库**（`Dehowy/dsh-model-master-badges`）的 release 比较。
 
-这意味着：本仓库发 `v1.3.0` 之后，装 1.2.0 的用户会收到「有更新」，点进去是本仓库的 release 页 —— 正确行为。上游发新版**不会**触发提示（fork 用户不该被引去换成上游构建，那会把促销标签换回 TOP100 按钮）。
+这意味着：本仓库发 `v1.3.0` 之后，装 1.2.x 的用户会收到「有更新」，点进去是本仓库的 release 页 —— 正确行为。上游发新版**不会**触发提示（fork 用户不该被引去换成上游构建，那会把促销标签换回 TOP100 按钮）。
 
 版本号必须是纯 `MAJOR.MINOR.PATCH`，不能用 `1.2.1-fork.1` 这种预发布后缀：`compareVersions()` 把预发布排在正式版**之下**，`1.2.0` 与 `1.2.0-fork.1` 相比永远读作「有更新」，变成永久误报。`tests/test-host.mjs` 断言了这一点。
 
@@ -297,7 +297,7 @@ dsh plugin --profile web remove dsh-model-master
   "current": "1.0.0",
   "latest": "1.1.0",
   "hasUpdate": true,
-  "releaseUrl": "https://github.com/Dehowy/dsh-model-master-badges/releases/tag/v1.2.0",
+  "releaseUrl": "https://github.com/Dehowy/dsh-model-master-badges/releases/tag/v1.2.1",
   "releaseNotes": "首个公开版本…",
   "publishedAt": 1761536000000,
   "sourceKind": "live",
@@ -359,7 +359,7 @@ npm run format:check
 | 方式        | 用户侧命令                                                                     | 需要构建授权          |
 | ----------- | ------------------------------------------------------------------------------ | --------------------- |
 | **git**     | `dsh plugin --profile web add github:Dehowy/dsh-model-master-badges`           | 否（纯 JS，无构建步骤） |
-| **tarball** | `dsh plugin --profile web add ./dsh-model-master-1.2.0.tgz`                    | 否（预构建产物）        |
+| **tarball** | `dsh plugin --profile web add ./dsh-model-master-<version>.tgz`                    | 否（预构建产物）        |
 | **本地目录** | `dsh plugin --profile web add ./dsh-model-master-badges`                       | 否                    |
 
 > 上游那套 `add dsh-model-master`（走 npm registry）在这里**不可用** —— 本 fork 没发布到 npm，那个 spec 装的是上游原版。
@@ -409,7 +409,7 @@ DSH **没有官方市场**。用户可以在 Plugins 页面打开实验特性 _C
       "icon": "icons/model-master.svg",
       "versions": [
         {
-          "version": "1.2.0",
+          "version": "1.2.1",
           "publishTimestamp": 1761536000,
           "source": { "type": "npm" },
           "engines": { "dsh": ">=0.2.0 <0.3.0" }
@@ -443,7 +443,7 @@ node -e "JSON.parse(require('fs').readFileSync('package.json','utf8'))"
 2. 起一个 throwaway profile 装一次真的：
 
    ```bash
-   dsh plugin --profile smoke add ./dsh-model-master-1.2.0.tgz
+   dsh plugin --profile smoke add ./dsh-model-master-<version>.tgz
    dsh --profile smoke --dump-config | grep dsh-model-master
    ```
 
