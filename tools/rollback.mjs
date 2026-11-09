@@ -10,23 +10,19 @@
  *   node tools/rollback.mjs --dry-run   report what would be restored
  */
 import fs from 'node:fs'
-import os from 'node:os'
 import path from 'node:path'
+import { profilePaths, ROLLBACK_PAYLOAD } from './profile-paths.mjs'
 
 const dryRun = process.argv.includes('--dry-run')
-
-const HOME = process.env.DSH_HOME || path.join(os.homedir(), '.dsh')
-const PROFILE = process.env.DSH_PROFILE || 'desktop'
-const targetDir = path.join(HOME, 'profiles', PROFILE, 'node_modules', 'dsh-model-master')
-const backupDir = `${targetDir}.pre-fork`
-
-const PAYLOAD = ['index.js', 'client.js', 'package.json', 'cordis.patch.yml', 'icon.svg', 'screenshots.json']
+const { profileDir, targetDir, backupDir } = profilePaths()
 
 const log = msg => console.log(dryRun ? `[dry-run] ${msg}` : msg)
 const fail = msg => {
   console.error(`\nrollback: ${msg}\n`)
   process.exit(1)
 }
+
+console.log(`profile: ${profileDir}\n`)
 
 if (!fs.existsSync(backupDir)) {
   fail(
@@ -48,6 +44,8 @@ for (const rel of ['index.js', 'client.js', 'package.json']) {
   }
 }
 
+// If the backup already contains the fork, it is not a pristine upstream copy and
+// restoring it would silently keep the patch while deleting the marker.
 const backupClient = fs.readFileSync(path.join(backupDir, 'client.js'), 'utf8')
 if (backupClient.includes('renderModelBadge')) {
   fail(
@@ -57,7 +55,7 @@ if (backupClient.includes('renderModelBadge')) {
 }
 
 log(`restoring from ${backupDir}`)
-for (const rel of PAYLOAD) {
+for (const rel of ROLLBACK_PAYLOAD) {
   const from = path.join(backupDir, rel)
   if (!fs.existsSync(from)) {
     log(`  (skip ${rel}: not in backup)`)
