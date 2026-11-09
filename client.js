@@ -132,12 +132,15 @@ window.__ModuleLoader__.load({
     // border-radius renders as a squircle (see the same warning near CSS below).
     // Truncation lives on the inner text span because text-overflow does not
     // apply to an inline-flex container.
-    var BADGE_TONES = { neutral: 1, info: 1, success: 1, warning: 1 }
+    var BADGE_TONES = ['neutral', 'info', 'success', 'warning']
     function renderModelBadge(badge) {
       if (!badge) return null
       var text = badgeText(badge)
       if (!text) return null
-      var tone = BADGE_TONES[badge.tone] ? badge.tone : 'neutral'
+      // Array membership, not an object lookup: a tone of "constructor" or
+      // "__proto__" would otherwise resolve through Object.prototype and emit
+      // a class that no rule matches.
+      var tone = BADGE_TONES.indexOf(badge.tone) === -1 ? 'neutral' : badge.tone
       return h(
         'span',
         { className: 'dmm-badge dmm-badge-' + tone, title: text },
