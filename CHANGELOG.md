@@ -6,6 +6,46 @@
 `1.1.0`–`1.6.4` 的内部编号，公开发布时已重置 —— 那些编号不对应任何公开版本，
 仅作为开发记录留在文末的「内部迭代历史」中。
 
+## [1.2.0] — 2026-11-09
+
+**第一个 fork 版本。** 上游 `1.1.2` 加上本项目自己的改动，版本号从此与上游分开
+（上游 `v1.1.2` = 本 fork 的基线）。
+
+### 新增 (Added)
+
+- **模型行显示渠道下发的促销标签**：夜间折扣 / 限时免费 / 订阅优先 / Pro Only 等。
+  标签来自 provider adapter 的 `listModels()` 返回值里的 `model.badge`，宿主的
+  `buildModelCatalog()` 本就会原样转发，但插件自己的兜底目录（`/api/model-master/catalog`）
+  在投影模型对象时把它丢掉了 —— 现在补上，两条目录路径都能显示。
+  渲染几何与配色对齐宿主 `Tag` 组件：`border-radius:999px` + `corner-shape:round`、
+  `padding:1px 8px`、`font-size:11px`、`line-height:17px`、四档 tone 的 10% / 12% 底色。
+  文案按 `uiLang → 语言基码 → en` 取值，再兜底任意可用语言（宁可显示英文，不留空胶囊）。
+
+### 移除 (Removed)
+
+- 顶栏的作者头像与「点个★」入口。
+- 顶栏的 TOP100 按钮。排行榜的后端接口（`/leaderboard`、`/leaderboard/refresh`）与
+  面板渲染代码仍保留，只是没有入口；要恢复只需还原对应的 commit。
+
+### 修正 (Fixed)
+
+- **打包产物里的 `scripts.install` 会让任何人都装不上。** 该键名与 npm 的
+  `install` 生命周期钩子同名，消费者安装时会执行 `node tools/install.mjs`，而
+  `tools/` 出于体积考虑不在 `files[]` 里 —— 于是必然 `MODULE_NOT_FOUND`。
+  改名为 `fork:install` / `fork:rollback`，并在 `tools/pack.mjs` 加两道守卫
+  （生命周期键名撞名、脚本指向包内不存在的路径，任一命中即拒绝打包）。
+- **测试运行器在受限环境下全红。** 上游的 `*.test.js` 原用 `node --test <file>`
+  运行，该形式会为每个文件派生一个子进程，在禁止 piped-stdio 子进程的环境里统一
+  报 `spawn EPERM`，8 个文件全部失败且与断言无关。改为直接执行 `node <file>`，
+  `node:test` 仍打印摘要并在失败时返回非零退出码。
+
+### 变更 (Changed)
+
+- 更新检查改为对着**本仓库**（`Dehowy/dsh-model-master-badges`）的 release 比较，
+  不再对着上游。指向上游会把 fork 用户「更新」成上游构建，把促销标签换回 TOP100
+  按钮 —— 那不是用户想要的更新。
+- `repository` / `homepage` / `bugs` 指向本仓库。
+
 ## [1.1.2] — 2026-10-30
 
 修一个真实环境下的失效：**检查更新显示「无法确认是否有新版本 · 404」**，而新版本明明存在。

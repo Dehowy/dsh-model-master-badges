@@ -28,12 +28,13 @@ if (!fs.existsSync(backupDir)) {
   fail(
     `no backup at\n  ${backupDir}\n\n` +
       `Either the fork was never installed via tools/install.mjs, or the backup was\n` +
-      `removed. To get upstream back:\n  npm install dsh-model-master@1.1.2`
+      `removed. To get upstream back (that is upstream's version, not this fork's):\n` +
+      `  npm install dsh-model-master@1.1.2`
   )
 }
 
 if (!fs.existsSync(targetDir)) {
-  fail(`target directory is gone: ${targetDir}\nRestore it with npm install dsh-model-master@1.1.2`)
+  fail(`target directory is gone: ${targetDir}\nRestore upstream with: npm install dsh-model-master@1.1.2`)
 }
 
 // The backup must be a complete plugin, not a partial copy from an interrupted
@@ -50,7 +51,7 @@ const backupClient = fs.readFileSync(path.join(backupDir, 'client.js'), 'utf8')
 if (backupClient.includes('renderModelBadge')) {
   fail(
     'backup already contains the fork changes — it is not a pristine upstream copy.\n' +
-      'Restore upstream with: npm install dsh-model-master@1.1.2'
+      'Restore upstream with: npm install dsh-model-master@1.1.2 -- the fork is 1.2.0 and above'
   )
 }
 

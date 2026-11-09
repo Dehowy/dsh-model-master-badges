@@ -152,12 +152,14 @@ console.log('\n== the published manifest cannot run scripts a consumer lacks fil
     `dsh.bundle.patch resolves (${pkg.dsh?.bundle?.patch})`
   )
 
-  // A published package must not name a version the plugin will then argue with
-  // itself about. update-check compares against the upstream repo, so the version
-  // has to stay a plain semver the comparator understands.
+  // The version has to stay a plain semver the comparator understands, and it
+  // has to keep moving past whatever the fork's own last release shipped — the
+  // update checker compares it against releases on this repository now, not
+  // upstream's, so a version at or below the published tag reads as "up to date"
+  // forever.
   ok(
-    /^\d+\.\d+\.\d+(?:-[\w.]+)?$/.test(pkg.version),
-    `version is a plain semver (${pkg.version})`
+    /^\d+\.\d+\.\d+$/.test(pkg.version),
+    `version is a plain release semver, no prerelease tag (${pkg.version})`
   )
 }
 

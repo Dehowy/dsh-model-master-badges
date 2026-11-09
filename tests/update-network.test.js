@@ -13,7 +13,7 @@ import assert from 'node:assert/strict'
 
 import { __internals } from '../index.js'
 
-const { fetchLatestRelease } = __internals
+const { fetchLatestRelease, UPDATE_REPO_SLUG } = __internals
 
 const realFetch = globalThis.fetch
 
@@ -82,9 +82,14 @@ test('a failing API falls through to the plain redirect', async () => {
     assert.equal(r.via, 'redirect')
     assert.equal(r.sourceKind, 'live')
     // The link points at this project's release, built from the real slug and
-    // the tag read out of the redirect.
+    // the tag read out of the redirect. The slug comes from the module rather
+    // than being hardcoded: this fork points the checker at its own repository,
+    // and a literal here would quietly pin the old one.
     assert.ok(r.releaseUrl.endsWith('/releases/tag/v1.1.1'), `unexpected url: ${r.releaseUrl}`)
-    assert.ok(r.releaseUrl.includes('github.com/NEETnina/dsh-model-master'))
+    assert.ok(
+      r.releaseUrl.includes(`github.com/${UPDATE_REPO_SLUG}`),
+      `expected the release link to use ${UPDATE_REPO_SLUG}, got: ${r.releaseUrl}`
+    )
     // Fields the redirect cannot know must stay null rather than be guessed.
     assert.equal(r.releaseNotes, null)
     assert.equal(r.publishedAt, null)

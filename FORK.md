@@ -194,10 +194,24 @@ so the plugin's presence decides, not the directory's presence.
 
 ## Version
 
-`package.json` keeps upstream's `1.1.2` on purpose. The update checker compares
-against GitHub releases on `NEETnina/dsh-model-master`; bumping to something like
-`1.1.2-fork.1` would make `compareVersions()` report an update every time it ran,
-which is a permanent false alarm. The fork is identified by this file instead.
+The fork versions independently from upstream, starting at `1.2.0`. `1.2.0` is
+the first fork release: it is `1.1.2` plus the promo badges, the trimmed header
+and the packaging fixes.
+
+Why the number had to move off upstream's `1.1.2`: `index.js` compares the
+installed version against releases on **this** repository
+(`UPDATE_REPO_SLUG = 'Dehowy/dsh-model-master-badges'`). If the fork had kept
+`1.1.2` while this repository published `v1.2.0`, every install would report a
+permanent "update available" pointing at a release it already ran. Conversely, a
+prerelease suffix such as `1.1.2-fork.1` would do the same thing in the other
+direction — `compareVersions()` ranks a prerelease *below* the plain version, so
+`1.2.0` vs `1.2.0-fork.1` always reads as an update. Fork versions therefore stay
+plain `MAJOR.MINOR.PATCH`, and `tests/test-host.mjs` asserts it.
+
+Consequence for following upstream: there are now two version lines. Upstream
+tags stay `v1.x.y` and the fork tags its own releases on top. The rebase recipe
+below still starts from upstream's `v1.1.2` because that is where the fork's
+commits were originally replayed; it does not need to track the fork's number.
 
 ## Attribution
 

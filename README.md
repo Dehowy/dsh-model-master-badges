@@ -2,7 +2,7 @@
 
 > A Spotlight-style model switcher for **DeepSeek Harness (DSH)** — with real streaming speed probes, a live global leaderboard, and a 15-language UI.
 
-> **这是一个个人 fork，基于上游 v1.1.2，不打算合回上游。** 相对原版只有两处行为差异：
+> **这是一个个人 fork，基于上游 v1.1.2，不打算合回上游。** 版本号从 `1.2.0` 起独立于上游。相对原版只有两处行为差异：
 > ① 模型行显示渠道下发的促销小标签（夜间折扣 / 限时免费 / 订阅优先 / Pro Only 等）；
 > ② 去掉作者头像、「点个★」与 TOP100 按钮。详见 [FORK.md](./FORK.md)。
 > 因此下文凡提到「全球百强榜 / TOP100」的地方，**本 fork 里没有入口**（后端接口与面板渲染代码仍在，只是按钮已删）。
@@ -125,7 +125,7 @@ English / 中文 / हिन्दी / Español / Français / العربية / 
 
 需要 **DSH 与 Node.js ≥ 20**。
 
-> ⚠️ **这个 fork 没有发布到 npm，而且包名和版本号与上游完全相同（`dsh-model-master@1.1.2`）。**
+> ⚠️ **这个 fork 没有发布到 npm，而且包名与上游相同（都叫 `dsh-model-master`）。** 版本号已独立为 `1.2.0`。
 > 所以下面这条**装的是上游原版**，不是本 fork —— 你会得到 TOP100 按钮、作者头像，也看不到促销标签：
 >
 > ```bash
@@ -150,16 +150,16 @@ dsh plugin --profile web add github:Dehowy/dsh-model-master-badges
 
 ### 方式二：tarball
 
-从 [Releases](https://github.com/Dehowy/dsh-model-master-badges/releases) 下载 `dsh-model-master-1.1.2.tgz`，然后：
+从 [Releases](https://github.com/Dehowy/dsh-model-master-badges/releases) 下载 `dsh-model-master-1.2.0.tgz`，然后：
 
 ```bash
-dsh plugin --profile web add ./dsh-model-master-1.1.2.tgz
+dsh plugin --profile web add ./dsh-model-master-1.2.0.tgz
 ```
 
 也可以自己打一个：
 
 ```bash
-npm run pack     # → dist/dsh-model-master-1.1.2.tgz（会先校验 manifest，再逐字节回读校验）
+npm run pack     # → dist/dsh-model-master-1.2.0.tgz（会先校验 manifest，再逐字节回读校验）
 ```
 
 ### 方式三：本地 clone 后装目录
@@ -198,7 +198,13 @@ dsh plugin --profile web remove dsh-model-master
 
 ### 关于「检查更新」
 
-本 fork 的版本号**故意保持 1.1.2**。更新检查是对着上游仓库（`NEETnina/dsh-model-master`）的 release 比较的，上游最新就是 `v1.1.2`，所以不会误报有更新。代价是它也不会告诉你本 fork 自己有没有新提交 —— 想拿最新就直接重装上面的 git spec。
+本 fork 的版本号从 **1.2.0** 起独立于上游，更新检查对着**本仓库**（`Dehowy/dsh-model-master-badges`）的 release 比较。
+
+这意味着：本仓库发 `v1.3.0` 之后，装 1.2.0 的用户会收到「有更新」，点进去是本仓库的 release 页 —— 正确行为。上游发新版**不会**触发提示（fork 用户不该被引去换成上游构建，那会把促销标签换回 TOP100 按钮）。
+
+版本号必须是纯 `MAJOR.MINOR.PATCH`，不能用 `1.2.1-fork.1` 这种预发布后缀：`compareVersions()` 把预发布排在正式版**之下**，`1.2.0` 与 `1.2.0-fork.1` 相比永远读作「有更新」，变成永久误报。`tests/test-host.mjs` 断言了这一点。
+
+想拿本 fork 的最新代码，重装上面的 git spec 即可（git spec 拉的是分支 HEAD，与 release tag 是两件事）。
 
 ---
 
@@ -251,8 +257,8 @@ dsh plugin --profile web remove dsh-model-master
 - **不出本机。** 每个 HTTP 路由都有 loopback 围栏（`isAuthorized()`）：只接受 `localhost` / `127.0.0.1` / `::1` 的 Host，并校验 `Origin`。`localhost.evil.com` 这类前缀伪造会被拒绝。
 - **第一个对外请求**是拉取 `https://openrouter.ai/api/v1/models`（榜单数据源），带 10 秒超时，且有去重 + 频率限制，不会变成 RPC 风暴。
 - **版本检查会用到两个地址**，按顺序尝试，**任一个成功即停止**：
-  1. `GET https://api.github.com/repos/NEETnina/dsh-model-master/releases/latest` —— 公开接口，信息最全（含发布说明与日期），但未认证配额只有每小时每 IP 60 次。
-  2. `GET https://github.com/NEETnina/dsh-model-master/releases/latest` —— 纯网页 302，**不走 API、无配额、无需认证**，只从 `Location` 头里读出版本号。
+  1. `GET https://api.github.com/repos/Dehowy/dsh-model-master-badges/releases/latest` —— 公开接口，信息最全（含发布说明与日期），但未认证配额只有每小时每 IP 60 次。
+  2. `GET https://github.com/Dehowy/dsh-model-master-badges/releases/latest` —— 纯网页 302，**不走 API、无配额、无需认证**，只从 `Location` 头里读出版本号。
 
   为什么要有第二个：实测中 `api.github.com` 会在网络受限时返回 **404**，而该 release 通过普通 HTTPS 完全可达 ——
   只靠 API 的话，用户会看到「无法确认是否有新版本」，而问题其实出在链路上。**API 的 404 不再被当作最终结论**，
@@ -291,7 +297,7 @@ dsh plugin --profile web remove dsh-model-master
   "current": "1.0.0",
   "latest": "1.1.0",
   "hasUpdate": true,
-  "releaseUrl": "https://github.com/NEETnina/dsh-model-master/releases/tag/v1.1.0",
+  "releaseUrl": "https://github.com/Dehowy/dsh-model-master-badges/releases/tag/v1.2.0",
   "releaseNotes": "首个公开版本…",
   "publishedAt": 1761536000000,
   "sourceKind": "live",
@@ -353,7 +359,7 @@ npm run format:check
 | 方式        | 用户侧命令                                                                     | 需要构建授权          |
 | ----------- | ------------------------------------------------------------------------------ | --------------------- |
 | **git**     | `dsh plugin --profile web add github:Dehowy/dsh-model-master-badges`           | 否（纯 JS，无构建步骤） |
-| **tarball** | `dsh plugin --profile web add ./dsh-model-master-1.1.2.tgz`                    | 否（预构建产物）        |
+| **tarball** | `dsh plugin --profile web add ./dsh-model-master-1.2.0.tgz`                    | 否（预构建产物）        |
 | **本地目录** | `dsh plugin --profile web add ./dsh-model-master-badges`                       | 否                    |
 
 > 上游那套 `add dsh-model-master`（走 npm registry）在这里**不可用** —— 本 fork 没发布到 npm，那个 spec 装的是上游原版。
@@ -403,7 +409,7 @@ DSH **没有官方市场**。用户可以在 Plugins 页面打开实验特性 _C
       "icon": "icons/model-master.svg",
       "versions": [
         {
-          "version": "1.1.2",
+          "version": "1.2.0",
           "publishTimestamp": 1761536000,
           "source": { "type": "npm" },
           "engines": { "dsh": ">=0.2.0 <0.3.0" }
@@ -437,7 +443,7 @@ node -e "JSON.parse(require('fs').readFileSync('package.json','utf8'))"
 2. 起一个 throwaway profile 装一次真的：
 
    ```bash
-   dsh plugin --profile smoke add ./dsh-model-master-1.1.2.tgz
+   dsh plugin --profile smoke add ./dsh-model-master-1.2.0.tgz
    dsh --profile smoke --dump-config | grep dsh-model-master
    ```
 

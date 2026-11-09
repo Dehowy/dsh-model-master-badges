@@ -324,7 +324,13 @@ function surveyLeaderboardShared(dataDir, { force = false } = {}) {
 //      IP, so a result is cached for six hours and concurrent callers share one
 //      in-flight request — the same shape as the leaderboard survey.
 
-const UPDATE_REPO_SLUG = 'NEETnina/dsh-model-master'
+// This is the fork's own repository, not upstream's. The fork ships its own
+// releases (`v1.2.0` onwards) precisely so this check has something true to
+// compare against: pointing it at upstream would tell a fork user to "update"
+// into the upstream build, silently trading the promo badges away for the
+// TOP100 button. Exported through `__internals` so the tests assert the slug is
+// actually used, instead of hardcoding one repository name.
+const UPDATE_REPO_SLUG = 'Dehowy/dsh-model-master-badges'
 const UPDATE_CACHE_FILE = 'update-check.json'
 const UPDATE_MIN_INTERVAL_MS = 6 * 60 * 60 * 1000
 // A user-triggered check still keeps a short cooldown so a click-spamming user
@@ -1292,5 +1298,6 @@ export const __internals = {
   compareVersions,
   resolveUpdatePayload,
   fetchLatestRelease,
-  UPDATE_MIN_INTERVAL_MS
+  UPDATE_MIN_INTERVAL_MS,
+  UPDATE_REPO_SLUG
 }
