@@ -115,3 +115,22 @@ file by file, then asserts the result. It refuses to run if the target already
 carries this fork but no backup exists — that would destroy the only rollback
 path — and it never overwrites an existing backup, so a second install cannot
 back up its own output.
+
+## Tests
+
+```bash
+node tests/run.mjs        # this repository
+DMM_PLUGIN_DIR=<profile>/node_modules/dsh-model-master node tests/run.mjs   # the installed copy
+```
+
+Five files, 208 assertions. They read the real source rather than fixtures: the
+renderer functions are extracted by brace-matching out of `client.js` and executed
+in a `new Function` sandbox, so a bug in the file is a bug in the test. `test-load`
+runs the whole `client.js` inside a stub module loader with a fake React, which is
+the only check that catches a removed symbol still referenced at module scope.
+`test-endtoend` feeds the badges the adapters actually produce right now —
+recomputed from the live `cordis.patch.yml` through workbuddy's own
+`selectPromoBadge`, not a reimplementation — into the installed renderer.
+
+`DMM_PLUGIN_DIR` exists because "the tests pass" should be able to mean "the bytes
+DSH loads pass", which is a different claim from "the source in my editor passes".
