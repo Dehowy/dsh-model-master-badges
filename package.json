@@ -37,7 +37,8 @@
     "LICENSE",
     "README.md",
     "CHANGELOG.md",
-    "THIRD-PARTY-NOTICES.md"
+    "THIRD-PARTY-NOTICES.md",
+    "FORK.md"
   ],
   "keywords": [
     "deepseek",

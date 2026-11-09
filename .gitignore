@@ -9,3 +9,10 @@ package-lock.json
 *.bak
 .playwright-cli/
 *.tgz
+
+# Build output — regenerate with `node tools/pack.mjs`
+dist/
+_verify/
+
+# Local npm cache (npm's global cache is outside the workspace, so pack keeps one here when it uses npm)
+.npm-cache/
