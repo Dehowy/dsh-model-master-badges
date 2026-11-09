@@ -2,7 +2,12 @@
 
 > A Spotlight-style model switcher for **DeepSeek Harness (DSH)** — with real streaming speed probes, a live global leaderboard, and a 15-language UI.
 
-把 DSH 原生那个狭小的模型下拉列表，接管成一块可搜索、可测速、可对照全球榜单的居中大面板。**你的模型按钮和菜单仍然是原生的** —— 插件只在"小窗口即将弹出"的那一刻无缝接管。
+> **这是一个个人 fork，基于上游 v1.1.2，不打算合回上游。** 相对原版只有两处行为差异：
+> ① 模型行显示渠道下发的促销小标签（夜间折扣 / 限时免费 / 订阅优先 / Pro Only 等）；
+> ② 去掉作者头像、「点个★」与 TOP100 按钮。详见 [FORK.md](./FORK.md)。
+> 因此下文凡提到「全球百强榜 / TOP100」的地方，**本 fork 里没有入口**（后端接口与面板渲染代码仍在，只是按钮已删）。
+
+把 DSH 原生那个狭小的模型下拉列表，接管成一块可搜索、可测速的居中大面板。**你的模型按钮和菜单仍然是原生的** —— 插件只在"小窗口即将弹出"的那一刻无缝接管。
 
 <p align="center">
   <img src="./icon.svg" width="96" height="96" alt="dsh-model-master icon" />
@@ -11,11 +16,6 @@
 <p align="center">
   <img src="./assets/screenshot-1.png" width="49%" alt="模型选择面板（深色）：渠道分组、真实测速与智能优选" />
   <img src="./assets/screenshot-5.png" width="49%" alt="模型选择面板（浅色）" />
-</p>
-
-<p align="center">
-  <img src="./assets/screenshot-2.png" width="49%" alt="TOP100 全球榜单（深色）" />
-  <img src="./assets/screenshot-6.png" width="49%" alt="TOP100 全球榜单（浅色）" />
 </p>
 
 <p align="center">
@@ -50,11 +50,12 @@
 
 DSH 原生的模型选择器是一份紧凑的下拉列表：模型一多就难找，看不出哪个快，也没有任何"这个模型到底行不行"的客观参照。
 
-dsh-model-master 补齐三件事：
+dsh-model-master 补齐两件事：
 
 1. **找得快** — 全局搜索、按渠道分组、以及「⚡ 智能优选」直接给出当前分组里综合最优的那个。
 2. **看得见快** — 对任意模型发起**真实流式请求**，测出 TTFT（首字延迟，ms）与 TPS（生成吞吐，tok/s）。
-3. **有参照** — 全球百强榜，数据来自 OpenRouter 模型目录里的 Artificial Analysis 指数与 Design Arena Elo。
+
+> 上游还有第三件「有参照 — 全球百强榜」。本 fork 删掉了它的入口按钮，见顶部说明。
 
 ---
 
@@ -73,11 +74,13 @@ dsh-model-master 补齐三件事：
 - 批量测速逐个进行（并发 2，单条超时上限 20s），可随时停止。
 - 失败**如实显示失败**，并区分超时 / 不可达 / 403 / 配额 / 无密钥等原因。
 
-### 全球百强榜
+### 全球百强榜（本 fork 无入口）
 
 - 最多 100 行，按 Artificial Analysis 智能指数排序，辅以代码 / Agent 指数与 Design Arena Elo。
 - 点任意行 → 跳到本机搜索同名渠道，由你自己挑渠道（**不做自动匹配**，避免把榜单的模型错配到你本地的另一个渠道）。
 - 每日自动同步，可手动刷新；离线时展示本地缓存并明确标注。
+
+> 上游通过顶栏的 TOP100 按钮进入。本 fork 删了那个按钮，所以这一节描述的功能**在 UI 上不可达**；后端 `/leaderboard`、面板渲染与 `boardName` / `boardHeader` 文案都保留着，要恢复只需还原对应 commit。
 
 ### 版本更新提示
 
@@ -158,7 +161,6 @@ dsh plugin --profile web remove dsh-model-master
 | 测速单个模型  | 行尾「测」按钮                                       |
 | 批量测速      | 工具栏「测速 (N)」                                   |
 | 智能优选      | 工具栏「优选 · …」，在**当前作用域**内挑综合最优     |
-| 看榜单        | 顶部 TOP100                                          |
 | 换语言 / 主题 | 顶栏地球图标 / 明暗图标                              |
 
 面板内键盘：`/` 聚焦搜索，`Esc` 关闭，方向键在列表里移动。
@@ -434,6 +436,8 @@ node -e "JSON.parse(require('fs').readFileSync('package.json','utf8'))"
 ### 本项目原创
 
 Spotlight 模型面板、TTFT/TPS 流式测速、百强榜、15 语言界面、防顶掉备用入口。
+
+本 fork 追加：模型行促销标签（读取渠道下发的 `model.badge`，按宿主 `Tag` 的几何与配色渲染）。
 
 ### 宿主
 
